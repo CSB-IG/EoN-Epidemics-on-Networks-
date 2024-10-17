@@ -20,7 +20,7 @@ def aplicar_gillespie(G, tau, gamma, t):
 def mostrar_estados(G, sim, i):
     infectados = [nodo for nodo in G.nodes() if sim.get_statuses(time=i)[nodo] == 'I'] #get_statuses recuperamos la información necesaria 
     #Para ver el estatus de los nodos en cada tiempo i.
-    print(f"En el tiempo {i}: Infecciosos - {infectados}")
+    print(f"En el tiempo {i}: Infectados - {infectados}")
     #Aqui paso por cada nodo generado y solo extraigo los nodos infectados 
     return infectados
 
@@ -28,7 +28,7 @@ def mostrar_estados(G, sim, i):
 # Función que registra el estatus de los nodos infectados en t=i
 def registrar_estatus(sim, i):
     estatus_tiempo = sim.get_statuses(time=i)
-    print(f"Infectados en el tiempo {i}:")
+    print(f"Estados de los nodos{i}:")
     for nodo, estado in estatus_tiempo.items():
         print(f"Nodo {nodo}: {estado}")
         #Con esta funcion voy a mostrar la lista de nodos que infectaron a otros en cada tiempo i.
@@ -42,7 +42,7 @@ def actualizar_arbol_transmision(G, infectados, arbol_transmision, i):
             if vecino not in infectados:  # Asegurarse de que el vecino no está infectado
                 nuevos_infectados.add(vecino)#add ayudara solo a extraer los vecinos infectados 
                 arbol_transmision.add_edge(nodo, vecino, tiempo=i)#Estraemos la dupla de nodos y vecino para crear un borde. 
-    print(f"Infectados por los nodos en el tiempo {i}: {nuevos_infectados}")
+    print(f"Posibles infectados por interaccionen el tiempo {i}: {nuevos_infectados}")
     return nuevos_infectados
     #Con esta funcion se muestran los nodos que se infectaron por interacción. y posibles infecciosos.
 
@@ -74,7 +74,7 @@ def unir_redes(t, tau, gamma):
 
 # Parámetros de simulación
 t = 3  # Duración de la simulación
-tau = 0.15  # Tasa de transmisión
+tau = 0.2  # Tasa de transmisión
 gamma = 0  # Tasa de recuperación
 
 unir_redes(t, tau, gamma)
