@@ -1,4 +1,4 @@
-mport networkx as nx
+import networkx as nx
 import EoN
 import numpy as np
 import matplotlib.pyplot as plt
