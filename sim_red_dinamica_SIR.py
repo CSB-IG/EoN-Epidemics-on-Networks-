@@ -121,9 +121,6 @@ def generar_redes_transmision(t, tau, gamma, N, infec_ratio, rho,numero_de_indiv
             serie_temporal(sim, i)
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Funcion primordial dos para simulación de transmisión compleja.
-
-#generar_redes_complejas()
 
 
 
