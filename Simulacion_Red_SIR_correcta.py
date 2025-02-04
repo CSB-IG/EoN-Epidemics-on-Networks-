@@ -118,11 +118,6 @@ def generar_redes_transmision(t, tau, gamma, N, kave, rho, numero_de_individuos)
             # Llamamos la función de serie temporal para ver el comportamiento en cada tiempo i
             serie_temporal(sim, i)
 
-#---------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Funcion primordial dos para simulación de transmisión compleja.
-
-#generar_redes_complejas()
-#en un futuro agregare la parte compleja para ver el comportamiento. 
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 # Parámetros de simulación
