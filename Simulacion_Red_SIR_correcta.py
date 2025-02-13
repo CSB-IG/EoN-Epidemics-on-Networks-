@@ -25,7 +25,7 @@ def mostrar_estados(G, sim, i):
     susceptibles = [nodo for nodo in G.nodes() if sim.get_statuses(time=i)[nodo] == 'S']
     infectados = [nodo for nodo in G.nodes() if sim.get_statuses(time=i)[nodo] == 'I']
     recuperados = [nodo for nodo in G.nodes() if sim.get_statuses(time=i)[nodo] == 'R']
-    print(f"En el tiempo {i}:Susceptibles - {susceptibles} Infectados - {infectados}, Recuperados - {recuperados}")
+    print(f"Tiempo {i}:Susceptibles - {susceptibles} Infectados - {infectados}, Recuperados - {recuperados}")
     return infectados, recuperados
 
 #----------------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ def generar_redes_transmision(t, tau, gamma, N, kave, rho, numero_de_individuos)
                     color_map.append('green')  # Otros nodos
 
             nx.draw(arbol_transmision, pos, ax=ax, with_labels=True, node_color=color_map, node_size=500, arrows=True)
-            plt.title(f"Árbol de Transmisión hasta el tiempo {i}")
+            plt.title(f"Árbol de Transmisión en el tiempo {i}")
             plt.show()
             
             # Llamamos la función de serie temporal para ver el comportamiento en cada tiempo i
@@ -122,7 +122,7 @@ def generar_redes_transmision(t, tau, gamma, N, kave, rho, numero_de_individuos)
 #--------------------------------------------------------------------------------------------------------------------------------------------
 # Parámetros de simulación
 t = 10  # Duración de la simulación.
-N = 2  # Número de redes que se quieren simular, se muestra una red primero y despues una nueva red, cada una diferente y pueden ser varias.
+N = 1  # Número de redes que se quieren simular, se muestra una red primero y despues una nueva red, cada una diferente y pueden ser varias.
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 gamma = 0.1  # Tasa de recuperación. L = 1/gamma o donde L es la tasa de recuperación en caso de no saber como calcular L simplemente es el promedio.
 # de el tiempo que tarda en recuperarse cada persona entre el numero de personas, L= suma de dias de cada individuo para recuperarse/'n' numero de personas. Gamma simplemente se
