@@ -4,18 +4,46 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import cycle
+
+
 #---------------------------------------------------------------------------------------------------
-def generar_red_SBM(kave, numero_de_individuos, bloques):
-  tam = [numero_de_individuos // bloques] * bloques
+def generar_red_SBM(kave, numero_de_individuos, bloques, probabilidad_externa_base):
+    #tam sera el tamaño que tendran nuestras comunidades 
+    tam = [numero_de_individuos // bloques] * bloques #Aqui hacemos una division dada por el usuario de bloques, y se asigna el numero total de individuos en cada bloque, ojo aqui puede no encluir todavia a todo el conjunto de los individuos dados
+    for i in range(numero_de_individuos % bloques):  
+        tam[i] += 1 # Con este ciclo en caso de que falten individuos por meter en los bloques entonces lo que se hace es terminar de añadirlos.                           
+
+    # Probabilidad de conexión dentro de la misma comunidad
+    probabilidad_interna = kave / (numero_de_individuos - 1)
+    
+
+    # Construcción de la matriz de probabilidades (P)
+    P = np.full((bloques, bloques), probabilidad_externa_base)
+    np.fill_diagonal(P, probabilidad_interna)
+
+     #Se crea la red se SBM
+    G = nx.stochastic_block_model(tam, P)
+
+    
+    comunidades = []
+    start_idx = 0
+    #En esta parte se utiliza para determinar cuántos nodos pertenecen a cada comunidad y para generar los conjuntos de nodos que se almacenan en comunidades
+    for size in tam:
+        comunidades.append(set(range(start_idx, start_idx + size)))
+        start_idx += size
+
+    print(f"start_idx-{comunidades}")    
+    return G, comunidades, P
   
   
 #---------------------------------------------------------------------------------------------------
 #Funcion principal la cual dependera de otras funciones para poder realizar la simulación dinamica SBM
-def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques):
-  # Colores llamativos para las comunidades
-  colores_comunidades = ['#FF6347', '#FFD700', '#FF1493', '#00FFFF', '#32CD32', '#8A2BE2', '#FF4500', '#9ACD32', '#DA70D6', '#FF8C00']
-    
+def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base):
+    # Colores llamativos para las comunidades
+    colores_comunidades = ['#FF6347', '#FFD700', '#FF1493', '#00FFFF', '#32CD32', '#8A2BE2', '#FF4500', '#9ACD32', '#DA70D6', '#FF8C00']
 
+    for z in range(1,N+1):
+        G, comunidades, P = generar_red_SBM(kave, numero_de_individuos, bloques, probabilidad_externa_base)
 
 #----------------------------------------------------------------------------------------------------
 # Parámetros de simulación
@@ -27,5 +55,8 @@ kave = 5  # Grado promedio de conexiones en la red
 tau = 2 * gamma / kave  # Tasa de transmisión
 numero_de_individuos = 300  # Número de nodos
 bloques = 8  # Número de comunidades
+probabilidad_externa_base = 0.01 # Probabilidad base de conexión entre comunidades (puede variar entre pasos)
 
-simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques)
+
+
+simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base)
