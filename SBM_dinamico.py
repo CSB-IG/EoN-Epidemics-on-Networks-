@@ -31,24 +31,25 @@ def generar_red_SBM(kave, numero_de_individuos, bloques, probabilidad_externa_ba
     for size in tam:
         comunidades.append(set(range(start_idx, start_idx + size)))
         start_idx += size
-
+        #El ciclo simplemente sirve para poder poder verificar las comunidades que se realizaron. 
     print(f"start_idx-{comunidades}")    
-    return G, comunidades, P
+    return G, comunidades, P #Lo mas importante antes de realizar el algoritmo de gillespie es la G red, las comunidades que se crean y la matriz propabilidad P de conexiones.
   
 #----------------------------------------------------------------------------------------------------
 # Función que aplica la simulación Gillespie SIR
 def aplicar_gillespie(G, tau, gamma, rho, t):
     sim = EoN.Gillespie_SIR(G, tau, gamma, rho=rho, tmax=t, return_full_data=True) #Esta parte ya fue aplicada y verifica en los anteriores algoritmos de redes dinamicas
-    return sim
+    return sim # Con sim obtengo la simulacion con todos los parametros dados por el ususario asi que esta parte es importante. 
+#Nota: El algoritmo de Gillespie_SIR puede ser cambiado por el fast_Gillespie solo se cambia el metodo que se quiere utilizar, lo demas se conserva igual y no afecta en proceso dinamico.
 
 #----------------------------------------------------------------------------------------------------
 # Función que muestra los nodos suseptibles, infectados y recuperados en t=i
 def mostrar_estados(G, sim, i):
-    susceptibles = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'S']
-    infectados = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'I']
-    recuperados = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'R']
-    print(f"Tiempo {i}: Susceptibles-{len(susceptibles)} Infectados-{len(infectados)} Recuperados-{len(recuperados)}")
-    return infectados, recuperados
+    susceptibles = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'S'] #Este ciclo ayuda a poder tomar todos los individuos susceptibles
+    infectados = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'I'] #Este ciclo ayuda a poder tomar todos los individuos infectados
+    recuperados = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'R'] #Este ciclo ayuda a poder tomas todos los individuos recuperados
+    print(f"Tiempo {i}: Susceptibles-{len(susceptibles)} Infectados-{len(infectados)} Recuperados-{len(recuperados)}") #Aqui mostramos la lista de individuos en cada tiempo i 
+    return infectados, recuperados  #Solo se toman los valores que se actualizan en cada tiempo i, claro tambien los susceptibles pero no es necesario trabajar mas con ellos. 
 
 #---------------------------------------------------------------------------------------------------
 #Funcion principal la cual dependera de otras funciones para poder realizar la simulación dinamica SBM
@@ -57,6 +58,7 @@ def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloq
     colores_comunidades = ['#FF6347', '#FFD700', '#FF1493', '#00FFFF', '#32CD32', '#8A2BE2', '#FF4500', '#9ACD32', '#DA70D6', '#FF8C00']
 
     for z in range(1,N+1):
+        #Las siguientes funciones ayudaran a tener un estandar para la simulacion la cual se trabajara hasta el N dado y en el tiempo i dado.
         G, comunidades, P = generar_red_SBM(kave, numero_de_individuos, bloques, probabilidad_externa_base)
         sim = aplicar_gillespie(G, tau, gamma, rho, t)
 
@@ -78,4 +80,5 @@ probabilidad_externa_base = 0.01 # Probabilidad base de conexión entre comunida
 
 
 
-simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base)
+simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base) # Ojo esta parte ayuda a invocar la funcion primordial,
+#En caso de no tomar en cuenta esta informacion, el usuario es responsable del mal funcionamiento del sistema dinamico. 
