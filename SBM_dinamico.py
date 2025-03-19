@@ -35,7 +35,13 @@ def generar_red_SBM(kave, numero_de_individuos, bloques, probabilidad_externa_ba
     print(f"start_idx-{comunidades}")    
     return G, comunidades, P
   
-  
+#----------------------------------------------------------------------------------------------------
+# Función que aplica la simulación Gillespie SIR
+def aplicar_gillespie(G, tau, gamma, rho, t):
+    sim = EoN.Gillespie_SIR(G, tau, gamma, rho=rho, tmax=t, return_full_data=True) #Esta parte ya fue aplicada y verifica en los anteriores algoritmos de redes dinamicas
+    return sim
+
+
 #---------------------------------------------------------------------------------------------------
 #Funcion principal la cual dependera de otras funciones para poder realizar la simulación dinamica SBM
 def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base):
@@ -44,6 +50,7 @@ def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloq
 
     for z in range(1,N+1):
         G, comunidades, P = generar_red_SBM(kave, numero_de_individuos, bloques, probabilidad_externa_base)
+        sim = aplicar_gillespie(G, tau, gamma, rho, t)
 
 #----------------------------------------------------------------------------------------------------
 # Parámetros de simulación
