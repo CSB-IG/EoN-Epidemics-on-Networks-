@@ -41,6 +41,14 @@ def aplicar_gillespie(G, tau, gamma, rho, t):
     sim = EoN.Gillespie_SIR(G, tau, gamma, rho=rho, tmax=t, return_full_data=True) #Esta parte ya fue aplicada y verifica en los anteriores algoritmos de redes dinamicas
     return sim
 
+#----------------------------------------------------------------------------------------------------
+# Función que muestra los nodos suseptibles, infectados y recuperados en t=i
+def mostrar_estados(G, sim, i):
+    susceptibles = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'S']
+    infectados = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'I']
+    recuperados = [n for n in G.nodes() if sim.get_statuses(time=i)[n] == 'R']
+    print(f"Tiempo {i}: Susceptibles-{len(susceptibles)} Infectados-{len(infectados)} Recuperados-{len(recuperados)}")
+    return infectados, recuperados
 
 #---------------------------------------------------------------------------------------------------
 #Funcion principal la cual dependera de otras funciones para poder realizar la simulación dinamica SBM
@@ -51,6 +59,10 @@ def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloq
     for z in range(1,N+1):
         G, comunidades, P = generar_red_SBM(kave, numero_de_individuos, bloques, probabilidad_externa_base)
         sim = aplicar_gillespie(G, tau, gamma, rho, t)
+
+        for i in range(1, t+1):
+            print(f"\n--- Tiempo {i} ---")
+            infectados, recuperados = mostrar_estados(G, sim, i)
 
 #----------------------------------------------------------------------------------------------------
 # Parámetros de simulación
