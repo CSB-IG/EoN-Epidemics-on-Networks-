@@ -51,6 +51,28 @@ def mostrar_estados(G, sim, i):
     print(f"Tiempo {i}: Susceptibles-{len(susceptibles)} Infectados-{len(infectados)} Recuperados-{len(recuperados)}") #Aqui mostramos la lista de individuos en cada tiempo i 
     return infectados, recuperados  #Solo se toman los valores que se actualizan en cada tiempo i, claro tambien los susceptibles pero no es necesario trabajar mas con ellos. 
 
+def serie_temporal(sim,t):
+    tiempos = range( t + 1 )
+    S, I, R = [], [], [] #En esta parte generaremos listas vacias para garantizar la actualizacion de los estados en cada tiempo t y no repetir los datos en cada ciclo.
+    for i in tiempos:
+        estatus_tiempo = sim.get_statuses(time = i)# con get_statutes veremos el estado de los individuos en cada tiempo i para posteriormente extraer la informacion.
+        # Con los siguientes comandos añadimos ya sean susptibles, infectados o recuperados segun sea la actualizacion de los datos generados por las funciones anteriores.
+        S.append(sum(1 for e in estatus_tiempo.values() if e == 'S'))
+        I.append(sum(1 for e in estatus_tiempo.values() if e == 'I'))
+        R.append(sum(1 for e in estatus_tiempo.values() if e == 'R'))
+
+    #Los siguientes comandos simplemente mostraran en pantalla la serie temporal de los estados de los invidviduos por suseptibles, infectados y recuperados.    
+    plt.figure(figsize=(10, 6))
+    plt.plot(tiempos, S, label="Saludables (S)", color='green')
+    plt.plot(tiempos, I, label="Infectados (I)", color='red')
+    plt.plot(tiempos, R, label="Recuperados (R)", color='blue')
+    plt.xlabel("Tiempo")
+    plt.ylabel("Número de individuos")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+
 #---------------------------------------------------------------------------------------------------
 #Funcion principal la cual dependera de otras funciones para poder realizar la simulación dinamica SBM
 def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base):
@@ -64,16 +86,18 @@ def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloq
 
         for i in range(1, t+1):
             print(f"\n--- Tiempo {i} ---")
-            infectados, recuperados = mostrar_estados(G, sim, i)
+            infectados, recuperados = mostrar_estados(G, sim, i) #Invocando la funcion podemos ver los estados de los individuos ojo esta linea es muy importante.
+            serie_temporal(sim, t) #Invocamos la funcion para ver la serie temporal, esta funcion puede ocuparse o no ya que solo muestra el estado de la simulacion graficamente, por lo tanto no existe problema si se elimina esta linea.
+            
 
 #----------------------------------------------------------------------------------------------------
 # Parámetros de simulación
 t = 10  # Duración de la simulación
 N = 1  # Número de redes simuladas
-gamma = 0.1  # Tasa de recuperación
-rho = 0.1  # Fracción inicial de infectados
+gamma = 0.01  # Tasa de recuperación
+rho = 0.2  # Fracción inicial de infectados
 kave = 5  # Grado promedio de conexiones en la red
-tau = 2 * gamma / kave  # Tasa de transmisión
+tau = 2 * gamma / kave  # Tasa de transmisión (Esta formula es parecida a la tasa de transmision de datos o información).
 numero_de_individuos = 300  # Número de nodos
 bloques = 8  # Número de comunidades
 probabilidad_externa_base = 0.01 # Probabilidad base de conexión entre comunidades (puede variar entre pasos)
