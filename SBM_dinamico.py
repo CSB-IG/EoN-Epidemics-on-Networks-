@@ -13,8 +13,8 @@ def generar_red_SBM(kave, numero_de_individuos, bloques, probabilidad_externa_ba
     for i in range(numero_de_individuos % bloques):  
         tam[i] += 1 # Con este ciclo en caso de que falten individuos por meter en los bloques entonces lo que se hace es terminar de añadirlos.                           
 
-    # Probabilidad de conexión dentro de la misma comunidad
-    probabilidad_interna = kave / (numero_de_individuos - 1)
+    # Asegurar que la probabilidad interna no exceda 1 (para redes muy densas)
+    probabilidad_interna = min(kave / (numero_de_individuos - 1), 1.0)
     
 
     # Construcción de la matriz de probabilidades (P)
@@ -73,17 +73,73 @@ def serie_temporal(sim,t):
 
 
 #----------------------------------------------------------------------------------------------------
-# Función para mostrar el heatmap de conexiones entre comunidades de manera dinámica    
-#def mostrar_heatmap_conexiones():
-
-
-
-
+# Función para visualizar una red SBM (Stochastic Block Model) con estados epidémicos
+def visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo="Red SBM"):
+    # Obtener el estado actual ('S', 'I' o 'R') de cada nodo en el tiempo i
+    estados = sim.get_statuses(time=i)  
+    
+    # Asignar colores a nodos según su estado epidemiológico:
+    # - Verde ('green') para Susceptibles ('S')
+    # - Rojo ('red') para Infectados ('I')
+    # - Azul ('blue') para Recuperados ('R')
+    color_nodos = []
+    for nodo in G.nodes():
+        if estados[nodo] == 'S':
+            color_nodos.append('green')
+        elif estados[nodo] == 'I':
+            color_nodos.append('red')
+        elif estados[nodo] == 'R':
+            color_nodos.append('blue')
+    
+    # Asignar colores fijos a las comunidades (cada comunidad mantiene su color)
+    color_comunidad = []
+    for nodo in G.nodes():
+        for idx, comunidad in enumerate(comunidades):
+            if nodo in comunidad:
+                # Usa colores cíclicamente si hay más comunidades que colores definidos
+                color_comunidad.append(colores_comunidades[idx % len(colores_comunidades)])
+                break
+    
+    # Crear disposición espacial de nodos (layout) agrupando por comunidades
+    pos = {}  # Diccionario para almacenar posiciones {nodo: (x,y)}
+    offset_x = 0  # Desplazamiento horizontal entre comunidades
+    
+    for comunidad in comunidades:
+        # Extraer subgrafo de la comunidad actual
+        comunidad_G = G.subgraph(comunidad)  
+        # Calcular disposición en círculo para esta comunidad (semilla fija para reproducibilidad)
+        comunidad_pos = nx.spring_layout(comunidad_G, seed=42)  
+        
+        # Ajustar coordenadas para separar comunidades horizontalmente
+        for nodo, p in comunidad_pos.items():
+            pos[nodo] = (p[0] + offset_x, p[1])  # Desplaza en eje X
+        
+        offset_x += 2  # Incrementa desplazamiento para la siguiente comunidad
+    
+    # Configurar figura para visualización
+    plt.figure(figsize=(12, 12))  # Tamaño grande para mejor visualización
+    
+    # Dibujar elementos del grafo:
+    # 1. Nodos con color de comunidad (fondo)
+    nx.draw_networkx_nodes(G, pos, node_size=50, node_color=color_comunidad, alpha=0.6)
+    # 2. Aristas con transparencia
+    nx.draw_networkx_edges(G, pos, edge_color="gray", alpha=0.5)
+    # 3. Nodos con color de estado (sobreposición)
+    nx.draw_networkx_nodes(G, pos, node_size=50, node_color=color_nodos, alpha=0.6)
+    # 4. Etiquetas numéricas de nodos
+    nx.draw_networkx_labels(G, pos, font_size=8, font_color="black")
+    
+    # Añadir título con paso de tiempo actual
+    plt.title(f"{titulo} - Tiempo {i}")
+    # Mostrar gráfico
+    plt.show()
 
 
 #----------------------------------------------------------------------------------------------------
-# Función que visualiza la red SBM en cada paso
-#def visualizar_red_sbm():
+# Función para mostrar el heatmap de conexiones entre comunidades de manera dinámica    
+
+
+
 
 
 
@@ -125,7 +181,8 @@ def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloq
             print(f"\n--- Tiempo {i} ---")
             infectados, recuperados = mostrar_estados(G, sim, i) #Invocando la funcion podemos ver los estados de los individuos ojo esta linea es muy importante.
             serie_temporal(sim, t) #Invocamos la funcion para ver la serie temporal, esta funcion puede ocuparse o no ya que solo muestra el estado de la simulacion graficamente, por lo tanto no existe problema si se elimina esta linea.
-
+            visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo=f"Red SBM en tiempo {i}")  # Visualización de la red en cada paso
+            
 
             G, P = actualizar_red(G, kave, numero_de_individuos, bloques, P, comunidades,var_de_prob)  # Actualizar la red
 
