@@ -180,7 +180,7 @@ def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloq
         for i in range(1, t+1):
             print(f"\n--- Tiempo {i} ---")
             infectados, recuperados = mostrar_estados(G, sim, i) #Invocando la funcion podemos ver los estados de los individuos ojo esta linea es muy importante.
-            serie_temporal(sim, t) #Invocamos la funcion para ver la serie temporal, esta funcion puede ocuparse o no ya que solo muestra el estado de la simulacion graficamente, por lo tanto no existe problema si se elimina esta linea.
+            serie_temporal(sim, i) #Invocamos la funcion para ver la serie temporal, esta funcion puede ocuparse o no ya que solo muestra el estado de la simulacion graficamente, por lo tanto no existe problema si se elimina esta linea.
             visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo=f"Red SBM en tiempo {i}")  # Visualización de la red en cada paso
             
 
