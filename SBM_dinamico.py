@@ -137,13 +137,56 @@ def visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo="Red 
 
 #----------------------------------------------------------------------------------------------------
 # Función para mostrar el heatmap de conexiones entre comunidades de manera dinámica    
-
-
-
-
-
-
-
+def visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo = "Red SBM" ):
+    #Obtener el estado de los nodos en el tiempo i
+    estados = sim.get_statuses(time=i)
+    
+    # Colores para los nodos según su estado
+    color_nodos = []
+    for nodo in G.nodes():
+        if estados[nodo] == 'S':
+            color_nodos.append('green')  # Susceptibles
+        elif estados[nodo] == 'I':
+            color_nodos.append('red')  # Infectados
+        elif estados[nodo] == 'R':
+            color_nodos.append('blue')  # Recuperados
+    
+    # Asignar colores fijos a las comunidades (solo una vez)
+    color_comunidad = []
+    for nodo in G.nodes():
+        for idx, comunidad in enumerate(comunidades):
+            if nodo in comunidad:
+                color_comunidad.append(colores_comunidades[idx % len(colores_comunidades)])
+                break
+    
+    # Crear posiciones para cada nodo, agrupados por comunidad
+    pos = {}
+    offset_x = 0
+    for comunidad in comunidades:
+        comunidad_G = G.subgraph(comunidad)
+        comunidad_pos = nx.spring_layout(comunidad_G, seed=42)
+        
+        # Ajustar la posición de la comunidad a un área específica
+        for nodo, p in comunidad_pos.items():
+            pos[nodo] = (p[0] + offset_x, p[1])
+        
+        offset_x += 2  # Aumentar el espacio entre comunidades
+    
+    # Visualización de la red con colores de nodos, números de nodos y colores para las comunidades
+    plt.figure(figsize=(12, 12))
+    
+    # Dibuja los nodos con color de comunidad
+    nx.draw_networkx_nodes(G, pos, node_size=50, node_color=color_comunidad, alpha=0.6)
+    nx.draw_networkx_edges(G, pos, edge_color="gray", alpha=0.5)
+    
+    # Dibuja los nodos con el color del estado (S, I, R)
+    nx.draw_networkx_nodes(G, pos, node_size=50, node_color=color_nodos, alpha=0.6)
+    
+    # Dibuja las etiquetas de los nodos
+    nx.draw_networkx_labels(G, pos, font_size=8, font_color="black")
+    
+    plt.title(f"{titulo} - Tiempo {i}")
+    plt.show()
 #----------------------------------------------------------------------------------------------------
 # Función que actualiza el grafo con una nueva red SBM en cada tiempo i
 def actualizar_red(G, kave, numero_de_individuos, bloques, P, comunidades, var_de_prob):
