@@ -180,6 +180,7 @@ def mostrar_heatmap_conexiones(P, i):
 
 #---------------------------------------------------------------------------------------------------
 #Funcion principal la cual dependera de otras funciones para poder realizar la simulación dinamica SBM
+#Tener mucho cuidado al modificar esta parte ya que es primordial en el codigo y cualquier cambio puede afectar el funcionamiento. 
 def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base,var_de_prob):
     # Colores llamativos para las comunidades
     colores_comunidades = ['#FF6347', '#FFD700', '#FF1493', '#00FFFF', '#32CD32', '#8A2BE2', '#FF4500', '#9ACD32', '#DA70D6', '#FF8C00']
@@ -203,7 +204,7 @@ def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloq
             G, P = actualizar_red(G, kave, numero_de_individuos, bloques, P, comunidades,var_de_prob)  # Actualizar la red en cada tiempo i para ver el comportamiento dinamico de la red.
 
 #----------------------------------------------------------------------------------------------------
-# Parámetros de simulación
+# Parámetros de simulación.
 t = 10  # Duración de la simulación el valor de t tiene que se un entero positivo t > 0
 N = 1  # Número de redes simuladas el valor de N tiene que ser un entero positivo N > 0
 gamma = 0.01  # Tasa de recuperación gamma tiene que estar entre 0 < gamma < 1 ya que esto marcara el como se recupera cada individuo osea su probabilidad de salir de una enfermedad.
