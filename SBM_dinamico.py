@@ -115,7 +115,7 @@ def visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo="Red 
         for nodo, p in comunidad_pos.items():
             pos[nodo] = (p[0] + offset_x, p[1])  # Desplaza en eje X
         
-        offset_x += 2  # Incrementa desplazamiento para la siguiente comunidad
+        offset_x += 3  # Aumentar el espacio entre comunidades este puede cambiar segun la neceidad del usuario. 
     
     # Configurar figura para visualización
     plt.figure(figsize=(12, 12))  # Tamaño grande para mejor visualización
@@ -136,58 +136,6 @@ def visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo="Red 
     plt.show()
 
 
-#----------------------------------------------------------------------------------------------------
-# Función para mostrar el heatmap de conexiones entre comunidades de manera dinámica    
-def visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo = "Red SBM" ):
-    #Obtener el estado de los nodos en el tiempo i
-    estados = sim.get_statuses(time=i)
-    
-    # Colores para los nodos según su estado
-    color_nodos = []
-    for nodo in G.nodes():
-        if estados[nodo] == 'S':
-            color_nodos.append('green')  # Susceptibles
-        elif estados[nodo] == 'I':
-            color_nodos.append('red')  # Infectados
-        elif estados[nodo] == 'R':
-            color_nodos.append('blue')  # Recuperados
-    
-    # Asignar colores fijos a las comunidades (solo una vez)
-    color_comunidad = []
-    for nodo in G.nodes():
-        for idx, comunidad in enumerate(comunidades):
-            if nodo in comunidad:
-                color_comunidad.append(colores_comunidades[idx % len(colores_comunidades)])
-                break
-    
-    # Crear posiciones para cada nodo, agrupados por comunidad
-    pos = {}
-    offset_x = 0
-    for comunidad in comunidades:
-        comunidad_G = G.subgraph(comunidad)
-        comunidad_pos = nx.spring_layout(comunidad_G, seed=42)
-        
-        # Ajustar la posición de la comunidad a un área específica
-        for nodo, p in comunidad_pos.items():
-            pos[nodo] = (p[0] + offset_x, p[1])
-        
-        offset_x += 2  # Aumentar el espacio entre comunidades
-    
-    # Visualización de la red con colores de nodos, números de nodos y colores para las comunidades
-    plt.figure(figsize=(12, 12))
-    
-    # Dibuja los nodos con color de comunidad
-    nx.draw_networkx_nodes(G, pos, node_size=50, node_color=color_comunidad, alpha=0.6)
-    nx.draw_networkx_edges(G, pos, edge_color="gray", alpha=0.5)
-    
-    # Dibuja los nodos con el color del estado (S, I, R)
-    nx.draw_networkx_nodes(G, pos, node_size=50, node_color=color_nodos, alpha=0.6)
-    
-    # Dibuja las etiquetas de los nodos
-    nx.draw_networkx_labels(G, pos, font_size=8, font_color="black")
-    
-    plt.title(f"{titulo} - Tiempo {i}")
-    plt.show()
 #----------------------------------------------------------------------------------------------------
 # Función que actualiza el grafo con una nueva red SBM en cada tiempo i
 def actualizar_red(G, kave, numero_de_individuos, bloques, P, comunidades, var_de_prob):
@@ -210,6 +158,26 @@ def actualizar_red(G, kave, numero_de_individuos, bloques, P, comunidades, var_d
     return G_nueva, P
 
 
+#----------------------------------------------------------------------------------------------------
+# Función para mostrar el heatmap de conexiones entre comunidades de manera dinámica
+def mostrar_heatmap_conexiones(P, i):
+    # Mostrar el heatmap de las probabilidades de conexión entre las comunidades
+    plt.figure(figsize=(8, 6)) #Tamaño de la figura la cual se puede modificar segun el usuario lo requiera.
+    cax = plt.imshow(P, cmap='YlGnBu', interpolation='nearest')
+    plt.colorbar(cax)
+    plt.title(f"Heatmap de conexiones entre comunidades - Tiempo {i}")
+    plt.xlabel("Comunidades")
+    plt.ylabel("Comunidades")
+    
+    # Etiquetas con la probabilidad de conexión en cada bloque
+    for i in range(len(P)):
+        for j in range(len(P)):
+            plt.text(j, i, f'{P[i][j]:.2f}', ha='center', va='center', color='black', fontsize=8)
+    
+    plt.xticks(ticks=np.arange(len(P)), labels=[f'Comuni {i}' for i in range(len(P))], rotation = 90) # Como la palabra comunidad no cabe en mi heatmap de manera adecuada entonces lo simplifico como "comuni"
+    plt.yticks(ticks=np.arange(len(P)), labels=[f'Comunidad {i}' for i in range(len(P))])
+    plt.show()
+
 #---------------------------------------------------------------------------------------------------
 #Funcion principal la cual dependera de otras funciones para poder realizar la simulación dinamica SBM
 def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base,var_de_prob):
@@ -223,12 +191,16 @@ def simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloq
 
         for i in range(1, t+1):
             print(f"\n--- Tiempo {i} ---")
+
             infectados, recuperados = mostrar_estados(G, sim, i) #Invocando la funcion podemos ver los estados de los individuos ojo esta linea es muy importante.
+            
             serie_temporal(sim, i) #Invocamos la funcion para ver la serie temporal, esta funcion puede ocuparse o no ya que solo muestra el estado de la simulacion graficamente, por lo tanto no existe problema si se elimina esta linea.
+            
             visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo=f"Red SBM en tiempo {i}")  # Visualización de la red en cada paso
             
+            mostrar_heatmap_conexiones(P, i)  # Mostrar el heatmap de conexiones entre comunidades
 
-            G, P = actualizar_red(G, kave, numero_de_individuos, bloques, P, comunidades,var_de_prob)  # Actualizar la red
+            G, P = actualizar_red(G, kave, numero_de_individuos, bloques, P, comunidades,var_de_prob)  # Actualizar la red en cada tiempo i para ver el comportamiento dinamico de la red.
 
 #----------------------------------------------------------------------------------------------------
 # Parámetros de simulación
