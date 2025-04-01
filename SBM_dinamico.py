@@ -82,6 +82,7 @@ def visualizar_red_sbm(G, sim, i, comunidades, colores_comunidades, titulo="Red 
     # - Verde ('green') para Susceptibles ('S')
     # - Rojo ('red') para Infectados ('I')
     # - Azul ('blue') para Recuperados ('R')
+    # A cada nodo se le podra asignar los colores que se desean para poder tener una visualizacion mas dinamica. 
     color_nodos = []
     for nodo in G.nodes():
         if estados[nodo] == 'S':
