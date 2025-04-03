@@ -214,8 +214,8 @@ tau = 2 * gamma / kave  # Tasa de transmisión (Esta formula es parecida a la ta
 numero_de_individuos = 300  # Número de nodos o de individuos a simular este valor tiene que estar en el conjunto de los enteros positivos  numero_de_individuos > 1
 bloques = 8  # Número de comunidades, esta variable tiene que estar en los enteros positivos, bloques > 0 por que no se pueden tener comunidades a medias o bueno no seria lo ideal 
 probabilidad_externa_base = 0.01 # Probabilidad base de conexión entre comunidades (puede variar entre pasos) al ser una probabilidad recordar que cualquier probabilidad debe de estar entre 0 y 1.
-var_de_prob=0.01 # Esta variable generara una variacion de las probabilidades entre las comunidades dependiendo el valor que se de, su dominio sera acotado por ese mismo valor en la parte negativa y positiva. Igualmente acostada entre 0 y 1.
-
+var_de_prob=1 # Esta variable generara una variacion de las probabilidades entre las comunidades dependiendo el valor que se de, su dominio sera acotado por ese mismo valor en la parte negativa y positiva. Igualmente acostada entre 0 y 1.
+# la misma var_de_prob dara el maximo valor de probabilidad que quiera el usuario. 
 
 
 simular_sbm_dinamico(t, N, tau, gamma, kave, rho, numero_de_individuos, bloques,probabilidad_externa_base, var_de_prob) # Ojo esta parte ayuda a invocar la funcion primordial,
